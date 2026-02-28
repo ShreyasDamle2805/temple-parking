@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>QR-enabled Parking Demo</title>
+  <style>
+    body{ font-family: Arial; padding: 20px; }
+    input, select { margin:6px 0; padding:6px; width:300px; }
+    button { padding:6px 12px; }
+    .qr { margin:8px 0; }
+    pre { background:#f4f4f4; padding:8px; }
+  </style>
+</head>
+<body>
+  <h1>QR-enabled Parking Automation — Demo</h1>
+
+  <h2>1. Create User</h2>
+  <input id="u_name" placeholder="Full name"><br>
+  <input id="u_mobile" placeholder="Mobile"><br>
+  <input id="u_email" placeholder="Email"><br>
+  <button onclick="createUser()">Create User</button>
+  <div id="userResult"></div>
+
+  <hr>
+  <h2>2. Create Vehicle (for a user)</h2>
+  <input id="v_user_id" placeholder="user_id"><br>
+  <input id="v_number" placeholder="Vehicle number"><br>
+  <select id="v_type">
+    <option value="Two-Wheeler">Two-Wheeler</option>
+    <option value="Three-Wheeler">Three-Wheeler</option>
+    <option value="Four-Wheeler">Four-Wheeler</option>
+  </select><br>
+  <button onclick="createVehicle()">Create Vehicle</button>
+  <div id="vehicleResult"></div>
+
+  <hr>
+  <h2>3. Create Slot (admin)</h2>
+  <input id="s_number" placeholder="Slot number (e.g., A3)"><br>
+  <select id="s_type">
+    <option value="Two-Wheeler">Two-Wheeler</option>
+    <option value="Three-Wheeler">Three-Wheeler</option>
+    <option value="Four-Wheeler">Four-Wheeler</option>
+  </select><br>
+  <button onclick="createSlot()">Create Slot</button>
+  <div id="slotResult"></div>
+
+  <hr>
+  <h2>4. Generate QR Image</h2>
+  <select id="qr_type">
+    <option value="user">User</option>
+    <option value="vehicle">Vehicle</option>
+  </select>
+  <input id="qr_id" placeholder="id (user_id or vehicle_id)"><br>
+  <button onclick="getQRCode()">Show QR</button>
+  <div id="qrdemo" class="qr"></div>
+
+  <hr>
+  <h2>5. Simulate Scan (ENTRY)</h2>
+  <input id="scan_payload_entry" placeholder="Paste QR payload"><br>
+  <button onclick="scanEntry()">Simulate Entry Scan</button>
+  <pre id="scanEntryResult"></pre>
+
+  <hr>
+  <h2>6. Simulate Scan (EXIT)</h2>
+  <input id="scan_payload_exit" placeholder="Paste QR payload"><br>
+  <input id="exit_record_id" placeholder="Optional: record_id"><br>
+  <button onclick="scanExit()">Simulate Exit Scan</button>
+  <pre id="scanExitResult"></pre>
+
+  <hr>
+  <h2>7. Current Parked Vehicles</h2>
+  <button onclick="listCurrent()">Show current parked</button>
+  <pre id="currentList"></pre>
+
+  <hr>
+  <h2>8. User Visits Report</h2>
+  <input id="report_user_id" placeholder="user_id">
+  <input id="report_from" type="date">
+  <input id="report_to" type="date"><br>
+  <button onclick="getUserVisits()">Get Visits</button>
+  <pre id="userVisitsResult"></pre>
+
+  <hr>
+  <h2>9. Slot Usage Report</h2>
+  <input id="report_slot_number" placeholder="Slot number (e.g., A2)">
+  <input id="slot_from" type="date">
+  <input id="slot_to" type="date"><br>
+  <button onclick="getSlotUsage()">Get Slot Usage</button>
+  <pre id="slotUsageResult"></pre>
+
+<script>
+const API = 'http://localhost:4000/api';
+
+async function createUser() {
+  const full_name = document.getElementById('u_name').value;
+  const mobile = document.getElementById('u_mobile').value;
+  const email = document.getElementById('u_email').value;
+  const res = await fetch(API + '/users', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ full_name, mobile, email })
+  });
+  const data = await res.json();
+  document.getElementById('userResult').innerText = JSON.stringify(data, null, 2);
+}
+
+async function createVehicle() {
+  const user_id = document.getElementById('v_user_id').value;
+  const vehicle_number = document.getElementById('v_number').value;
+  const vehicle_type = document.getElementById('v_type').value;
+  const res = await fetch(API + '/vehicles', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ user_id, vehicle_number, vehicle_type })
+  });
+  const data = await res.json();
+  document.getElementById('vehicleResult').innerText = JSON.stringify(data, null, 2);
+}
+
+async function createSlot() {
+  const slot_number = document.getElementById('s_number').value;
+  const slot_type = document.getElementById('s_type').value;
+  const res = await fetch(API + '/slots', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ slot_number, slot_type })
+  });
+  const data = await res.json();
+  document.getElementById('slotResult').innerText = JSON.stringify(data, null, 2);
+}
+
+async function getQRCode() {
+  const type = document.getElementById('qr_type').value;
+  const id = document.getElementById('qr_id').value;
+  const res = await fetch(API + '/qrcode/' + type + '/' + id);
+  const data = await res.json();
+  if (data.ok) {
+    document.getElementById('qrdemo').innerHTML = '<div>Payload: <b>' + data.payload + '</b></div><img src="'+data.dataUrl+'" alt="qr">';
+  } else {
+    document.getElementById('qrdemo').innerText = JSON.stringify(data);
+  }
+}
+
+async function scanEntry() {
+  const payload = document.getElementById('scan_payload_entry').value.trim();
+  const res = await fetch(API + '/scan/entry', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ payload })
+  });
+  const data = await res.json();
+  document.getElementById('scanEntryResult').innerText = JSON.stringify(data, null, 2);
+}
+
+async function scanExit() {
+  const payload = document.getElementById('scan_payload_exit').value.trim();
+  const record_id = document.getElementById('exit_record_id').value.trim();
+  const res = await fetch(API + '/scan/exit', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ payload, record_id: record_id || null })
+  });
+  const data = await res.json();
+  document.getElementById('scanExitResult').innerText = JSON.stringify(data, null, 2);
+}
+
+async function listCurrent() {
+  const res = await fetch(API + '/parking/current');
+  const data = await res.json();
+  document.getElementById('currentList').innerText = JSON.stringify(data, null, 2);
+}
+
+// Reports
+async function getUserVisits(){
+  const user_id = document.getElementById('report_user_id').value;
+  const from = document.getElementById('report_from').value;
+  const to = document.getElementById('report_to').value;
+  const res = await fetch(`${API}/visits/${user_id}?from=${from}&to=${to}`);
+  const data = await res.json();
+  document.getElementById('userVisitsResult').innerText = JSON.stringify(data, null, 2);
+}
+
+async function getSlotUsage(){
+  const slot_number = document.getElementById('report_slot_number').value;
+  const from = document.getElementById('slot_from').value;
+  const to = document.getElementById('slot_to').value;
+  const res = await fetch(`${API}/slot-usage/${slot_number}?from=${from}&to=${to}`);
+  const data = await res.json();
+  document.getElementById('slotUsageResult').innerText = JSON.stringify(data, null, 2);
+}
+</script>
+</body>
+</html>
