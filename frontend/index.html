@@ -1,188 +1,940 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>QR-enabled Parking Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Temple Parking System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
-    body{ font-family: Arial; padding: 20px; }
-    input, select { margin:6px 0; padding:6px; width:300px; }
-    button { padding:6px 12px; }
-    .qr { margin:8px 0; }
-    pre { background:#f4f4f4; padding:8px; }
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+      --success-color: #27ae60;
+      --danger-color: #e74c3c;
+      --warning-color: #f39c12;
+      --light-bg: #ecf0f1;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px 0;
+    }
+
+    .navbar {
+      background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 1rem 0;
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+
+    .navbar-brand i {
+      margin-right: 10px;
+    }
+
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .page-header {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .page-title {
+      color: var(--primary-color);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      color: #7f8c8d;
+      font-size: 0.95rem;
+    }
+
+    .nav-tabs {
+      border-bottom: 2px solid #e0e0e0;
+      background: white;
+      border-radius: 12px 12px 0 0;
+      padding: 0 1rem;
+    }
+
+    .nav-tabs .nav-link {
+      color: #7f8c8d;
+      border: none;
+      font-weight: 600;
+      padding: 1rem 1.5rem;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .nav-tabs .nav-link:hover {
+      color: var(--secondary-color);
+      border-bottom-color: var(--secondary-color);
+    }
+
+    .nav-tabs .nav-link.active {
+      color: var(--secondary-color);
+      background: transparent;
+      border-bottom-color: var(--secondary-color);
+    }
+
+    .tab-content {
+      background: white;
+      border-radius: 0 0 12px 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .form-section {
+      margin-bottom: 2rem;
+    }
+
+    .form-section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--light-bg);
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.1);
+    }
+
+    .form-select {
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-select:focus {
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.1);
+    }
+
+    .btn {
+      border-radius: 8px;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      transition: all 0.3s ease;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--secondary-color) 0%, #2980b9 100%);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--success-color) 0%, #229954 100%);
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(39, 174, 96, 0.3);
+    }
+
+    .btn-sm {
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+    }
+
+    .result-card {
+      background: #f8f9fa;
+      border-left: 4px solid var(--secondary-color);
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-top: 1.5rem;
+    }
+
+    .result-card.success {
+      background: #f0f8f5;
+      border-left-color: var(--success-color);
+    }
+
+    .result-card.error {
+      background: #fef5f5;
+      border-left-color: var(--danger-color);
+    }
+
+    .result-title {
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 0.75rem;
+    }
+
+    .result-content {
+      background: white;
+      padding: 1rem;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .qr-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-top: 1.5rem;
+    }
+
+    .qr-image {
+      max-width: 300px;
+      margin: 1rem 0;
+      border: 3px solid var(--secondary-color);
+      border-radius: 8px;
+      padding: 10px;
+      background: white;
+    }
+
+    .qr-payload {
+      text-align: center;
+      font-weight: 600;
+      color: var(--primary-color);
+      word-break: break-all;
+    }
+
+    .alert {
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 1.5rem;
+    }
+
+    .table-responsive {
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .table {
+      margin-bottom: 0;
+    }
+
+    .table thead {
+      background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      color: white;
+    }
+
+    .table thead th {
+      border: none;
+      font-weight: 600;
+      padding: 1rem;
+    }
+
+    .table tbody td {
+      padding: 0.75rem 1rem;
+      border-color: #e0e0e0;
+    }
+
+    .table tbody tr:hover {
+      background: #f8f9fa;
+    }
+
+    .badge {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .badge-success {
+      background: var(--success-color);
+    }
+
+    .badge-warning {
+      background: var(--warning-color);
+    }
+
+    .badge-primary {
+      background: var(--secondary-color);
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 1.5rem;
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    .spinner {
+      display: inline-block;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid var(--secondary-color);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: #7f8c8d;
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+      .nav-tabs .nav-link {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+      }
+
+      .tab-content {
+        padding: 1.5rem;
+      }
+
+      .qr-container {
+        padding: 1.5rem;
+      }
+
+      .page-header {
+        padding: 1.5rem;
+      }
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .icon-box {
+      font-size: 2rem;
+      margin-right: 1rem;
+    }
+
+    .section-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-top: 4px solid var(--secondary-color);
+    }
   </style>
 </head>
 <body>
-  <h1>QR-enabled Parking Automation — Demo</h1>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <i class="fas fa-parking"></i>Temple Parking System
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+  </nav>
 
-  <h2>1. Create User</h2>
-  <input id="u_name" placeholder="Full name"><br>
-  <input id="u_mobile" placeholder="Mobile"><br>
-  <input id="u_email" placeholder="Email"><br>
-  <button onclick="createUser()">Create User</button>
-  <div id="userResult"></div>
+  <!-- Main Container -->
+  <div class="main-container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="page-title"><i class="fas fa-qrcode"></i> QR-Enabled Parking Management</h1>
+      <p class="page-subtitle">Manage users, vehicles, parking slots, and track parking records</p>
+    </div>
 
-  <hr>
-  <h2>2. Create Vehicle (for a user)</h2>
-  <input id="v_user_id" placeholder="user_id"><br>
-  <input id="v_number" placeholder="Vehicle number"><br>
-  <select id="v_type">
-    <option value="Two-Wheeler">Two-Wheeler</option>
-    <option value="Three-Wheeler">Three-Wheeler</option>
-    <option value="Four-Wheeler">Four-Wheeler</option>
-  </select><br>
-  <button onclick="createVehicle()">Create Vehicle</button>
-  <div id="vehicleResult"></div>
+    <!-- Alert Messages -->
+    <div id="alertContainer"></div>
 
-  <hr>
-  <h2>3. Create Slot (admin)</h2>
-  <input id="s_number" placeholder="Slot number (e.g., A3)"><br>
-  <select id="s_type">
-    <option value="Two-Wheeler">Two-Wheeler</option>
-    <option value="Three-Wheeler">Three-Wheeler</option>
-    <option value="Four-Wheeler">Four-Wheeler</option>
-  </select><br>
-  <button onclick="createSlot()">Create Slot</button>
-  <div id="slotResult"></div>
+    <!-- Tabbed Interface -->
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="user-tab" data-bs-toggle="tab" data-bs-target="#user-panel" type="button" role="tab">
+          <i class="fas fa-user"></i> Users
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="vehicle-tab" data-bs-toggle="tab" data-bs-target="#vehicle-panel" type="button" role="tab">
+          <i class="fas fa-car"></i> Vehicles
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="slot-tab" data-bs-toggle="tab" data-bs-target="#slot-panel" type="button" role="tab">
+          <i class="fas fa-square"></i> Parking Slots
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="qr-tab" data-bs-toggle="tab" data-bs-target="#qr-panel" type="button" role="tab">
+          <i class="fas fa-qrcode"></i> QR Codes
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="scan-tab" data-bs-toggle="tab" data-bs-target="#scan-panel" type="button" role="tab">
+          <i class="fas fa-barcode"></i> Scanning
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports-panel" type="button" role="tab">
+          <i class="fas fa-chart-bar"></i> Reports
+        </button>
+      </li>
+    </ul>
 
-  <hr>
-  <h2>4. Generate QR Image</h2>
-  <select id="qr_type">
-    <option value="user">User</option>
-    <option value="vehicle">Vehicle</option>
-  </select>
-  <input id="qr_id" placeholder="id (user_id or vehicle_id)"><br>
-  <button onclick="getQRCode()">Show QR</button>
-  <div id="qrdemo" class="qr"></div>
+    <div class="tab-content">
+      <!-- Users Tab -->
+      <div class="tab-pane fade active show" id="user-panel" role="tabpanel">
+        <div class="section-card">
+          <h3 class="form-section-title"><i class="fas fa-user-plus"></i> Register New User</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="u_name">Full Name</label>
+              <input type="text" class="form-control" id="u_name" placeholder="Enter full name">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="u_mobile">Mobile Number</label>
+              <input type="tel" class="form-control" id="u_mobile" placeholder="Enter mobile number">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="u_email">Email Address</label>
+              <input type="email" class="form-control" id="u_email" placeholder="Enter email address">
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="createUser()">
+            <i class="fas fa-check"></i> Create User
+          </button>
+        </div>
+        <div id="userResult"></div>
+      </div>
 
-  <hr>
-  <h2>5. Simulate Scan (ENTRY)</h2>
-  <input id="scan_payload_entry" placeholder="Paste QR payload"><br>
-  <button onclick="scanEntry()">Simulate Entry Scan</button>
-  <pre id="scanEntryResult"></pre>
+      <!-- Vehicles Tab -->
+      <div class="tab-pane fade" id="vehicle-panel" role="tabpanel">
+        <div class="section-card">
+          <h3 class="form-section-title"><i class="fas fa-car-plus"></i> Register New Vehicle</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="v_user_id">User ID</label>
+              <input type="number" class="form-control" id="v_user_id" placeholder="Enter user ID">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="v_number">Vehicle Number</label>
+              <input type="text" class="form-control" id="v_number" placeholder="e.g., MH01AB1234">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="v_type">Vehicle Type</label>
+              <select class="form-select" id="v_type">
+                <option value="Two-Wheeler">Two-Wheeler</option>
+                <option value="Three-Wheeler">Three-Wheeler</option>
+                <option value="Four-Wheeler">Four-Wheeler</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="createVehicle()">
+            <i class="fas fa-check"></i> Create Vehicle
+          </button>
+        </div>
+        <div id="vehicleResult"></div>
+      </div>
 
-  <hr>
-  <h2>6. Simulate Scan (EXIT)</h2>
-  <input id="scan_payload_exit" placeholder="Paste QR payload"><br>
-  <input id="exit_record_id" placeholder="Optional: record_id"><br>
-  <button onclick="scanExit()">Simulate Exit Scan</button>
-  <pre id="scanExitResult"></pre>
+      <!-- Slots Tab -->
+      <div class="tab-pane fade" id="slot-panel" role="tabpanel">
+        <div class="section-card">
+          <h3 class="form-section-title"><i class="fas fa-square-plus"></i> Add New Parking Slot</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="s_number">Slot Number</label>
+              <input type="text" class="form-control" id="s_number" placeholder="e.g., A3, B5">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="s_type">Slot Type</label>
+              <select class="form-select" id="s_type">
+                <option value="Two-Wheeler">Two-Wheeler</option>
+                <option value="Three-Wheeler">Three-Wheeler</option>
+                <option value="Four-Wheeler">Four-Wheeler</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-success" onclick="createSlot()">
+            <i class="fas fa-check"></i> Create Slot
+          </button>
+        </div>
+        <div id="slotResult"></div>
+      </div>
 
-  <hr>
-  <h2>7. Current Parked Vehicles</h2>
-  <button onclick="listCurrent()">Show current parked</button>
-  <pre id="currentList"></pre>
+      <!-- QR Code Tab -->
+      <div class="tab-pane fade" id="qr-panel" role="tabpanel">
+        <div class="section-card">
+          <h3 class="form-section-title"><i class="fas fa-qrcode"></i> Generate QR Code</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="qr_type">QR Type</label>
+              <select class="form-select" id="qr_type">
+                <option value="user">User QR</option>
+                <option value="vehicle">Vehicle QR</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="qr_id">ID (User ID or Vehicle ID)</label>
+              <input type="number" class="form-control" id="qr_id" placeholder="Enter ID">
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="getQRCode()">
+            <i class="fas fa-image"></i> Generate QR
+          </button>
+        </div>
+        <div id="qrdemo"></div>
+      </div>
 
-  <hr>
-  <h2>8. User Visits Report</h2>
-  <input id="report_user_id" placeholder="user_id">
-  <input id="report_from" type="date">
-  <input id="report_to" type="date"><br>
-  <button onclick="getUserVisits()">Get Visits</button>
-  <pre id="userVisitsResult"></pre>
+      <!-- Scanning Tab -->
+      <div class="tab-pane fade" id="scan-panel" role="tabpanel">
+        <!-- Entry Scan -->
+        <div class="section-card">
+          <h3 class="form-section-title"><i class="fas fa-arrow-right"></i> Entry Scan</h3>
+          <div class="form-group">
+            <label class="form-label" for="scan_payload_entry">QR Payload</label>
+            <textarea class="form-control" id="scan_payload_entry" placeholder="Paste QR payload here" rows="2"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="scanEntry()">
+            <i class="fas fa-barcode"></i> Process Entry Scan
+          </button>
+          <div id="scanEntryResult"></div>
+        </div>
 
-  <hr>
-  <h2>9. Slot Usage Report</h2>
-  <input id="report_slot_number" placeholder="Slot number (e.g., A2)">
-  <input id="slot_from" type="date">
-  <input id="slot_to" type="date"><br>
-  <button onclick="getSlotUsage()">Get Slot Usage</button>
-  <pre id="slotUsageResult"></pre>
+        <!-- Exit Scan -->
+        <div class="section-card">
+          <h3 class="form-section-title"><i class="fas fa-arrow-left"></i> Exit Scan</h3>
+          <div class="form-group">
+            <label class="form-label" for="scan_payload_exit">QR Payload</label>
+            <textarea class="form-control" id="scan_payload_exit" placeholder="Paste QR payload here" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="exit_record_id">Record ID (Optional)</label>
+            <input type="number" class="form-control" id="exit_record_id" placeholder="Leave empty to auto-detect">
+          </div>
+          <button class="btn btn-primary" onclick="scanExit()">
+            <i class="fas fa-barcode"></i> Process Exit Scan
+          </button>
+          <div id="scanExitResult"></div>
+        </div>
 
-<script>
-const API = 'http://localhost:4000/api';
+        <!-- Current Parked -->
+        <div class="section-card">
+          <h3 class="form-section-title"><i class="fas fa-list"></i> Currently Parked Vehicles</h3>
+          <button class="btn btn-info" onclick="listCurrent()">
+            <i class="fas fa-refresh"></i> Load Current
+          </button>
+          <div id="currentList"></div>
+        </div>
+      </div>
 
-async function createUser() {
-  const full_name = document.getElementById('u_name').value;
-  const mobile = document.getElementById('u_mobile').value;
-  const email = document.getElementById('u_email').value;
-  const res = await fetch(API + '/users', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ full_name, mobile, email })
-  });
-  const data = await res.json();
-  document.getElementById('userResult').innerText = JSON.stringify(data, null, 2);
-}
+      <!-- Reports Tab -->
+      <div class="tab-pane fade" id="reports-panel" role="tabpanel">
+        <!-- User Visits Report -->
+        <div class="section-card">
+          <h3 class="form-section-title"><i class="fas fa-history"></i> User Visits Report</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="report_user_id">User ID</label>
+              <input type="number" class="form-control" id="report_user_id" placeholder="Enter user ID">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="report_from">From Date</label>
+              <input type="date" class="form-control" id="report_from">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="report_to">To Date</label>
+              <input type="date" class="form-control" id="report_to">
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="getUserVisits()">
+            <i class="fas fa-chart-line"></i> Get Visits Report
+          </button>
+          <div id="userVisitsResult"></div>
+        </div>
 
-async function createVehicle() {
-  const user_id = document.getElementById('v_user_id').value;
-  const vehicle_number = document.getElementById('v_number').value;
-  const vehicle_type = document.getElementById('v_type').value;
-  const res = await fetch(API + '/vehicles', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ user_id, vehicle_number, vehicle_type })
-  });
-  const data = await res.json();
-  document.getElementById('vehicleResult').innerText = JSON.stringify(data, null, 2);
-}
+        <!-- Slot Usage Report -->
+        <div class="section-card">
+          <h3 class="form-section-title"><i class="fas fa-chart-bar"></i> Slot Usage Report</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="report_slot_number">Slot Number</label>
+              <input type="text" class="form-control" id="report_slot_number" placeholder="e.g., A2">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="slot_from">From Date</label>
+              <input type="date" class="form-control" id="slot_from">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="slot_to">To Date</label>
+              <input type="date" class="form-control" id="slot_to">
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="getSlotUsage()">
+            <i class="fas fa-chart-bar"></i> Get Slot Usage Report
+          </button>
+          <div id="slotUsageResult"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-async function createSlot() {
-  const slot_number = document.getElementById('s_number').value;
-  const slot_type = document.getElementById('s_type').value;
-  const res = await fetch(API + '/slots', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ slot_number, slot_type })
-  });
-  const data = await res.json();
-  document.getElementById('slotResult').innerText = JSON.stringify(data, null, 2);
-}
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-async function getQRCode() {
-  const type = document.getElementById('qr_type').value;
-  const id = document.getElementById('qr_id').value;
-  const res = await fetch(API + '/qrcode/' + type + '/' + id);
-  const data = await res.json();
-  if (data.ok) {
-    document.getElementById('qrdemo').innerHTML = '<div>Payload: <b>' + data.payload + '</b></div><img src="'+data.dataUrl+'" alt="qr">';
-  } else {
-    document.getElementById('qrdemo').innerText = JSON.stringify(data);
-  }
-}
+  <script>
+    const API = 'http://localhost:4000/api';
 
-async function scanEntry() {
-  const payload = document.getElementById('scan_payload_entry').value.trim();
-  const res = await fetch(API + '/scan/entry', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ payload })
-  });
-  const data = await res.json();
-  document.getElementById('scanEntryResult').innerText = JSON.stringify(data, null, 2);
-}
+    // Helper: Show alert/notification
+    function showAlert(message, type = 'info') {
+      const alertId = 'alert-' + Date.now();
+      const alertHTML = `
+        <div id="${alertId}" class="alert alert-${type} alert-dismissible fade show" role="alert">
+          <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : 'info-circle'}"></i>
+          ${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      `;
+      const container = document.getElementById('alertContainer');
+      container.insertAdjacentHTML('beforeend', alertHTML);
+      setTimeout(() => {
+        const elem = document.getElementById(alertId);
+        if (elem) elem.remove();
+      }, 5000);
+    }
 
-async function scanExit() {
-  const payload = document.getElementById('scan_payload_exit').value.trim();
-  const record_id = document.getElementById('exit_record_id').value.trim();
-  const res = await fetch(API + '/scan/exit', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ payload, record_id: record_id || null })
-  });
-  const data = await res.json();
-  document.getElementById('scanExitResult').innerText = JSON.stringify(data, null, 2);
-}
+    // Helper: Validate input
+    function validateInput(value, fieldName) {
+      if (!value || value.trim() === '') {
+        showAlert(`${fieldName} is required!`, 'danger');
+        return false;
+      }
+      return true;
+    }
 
-async function listCurrent() {
-  const res = await fetch(API + '/parking/current');
-  const data = await res.json();
-  document.getElementById('currentList').innerText = JSON.stringify(data, null, 2);
-}
+    // Helper: Display result card
+    function displayResult(elementId, data, isSuccess = true) {
+      const resultHTML = `
+        <div class="result-card ${isSuccess ? 'success' : 'error'}">
+          <div class="result-title">${isSuccess ? '<i class="fas fa-check-circle"></i> Success' : '<i class="fas fa-exclamation-circle"></i> Error'}</div>
+          <div class="result-content">${JSON.stringify(data, null, 2)}</div>
+        </div>
+      `;
+      document.getElementById(elementId).innerHTML = resultHTML;
+    }
 
-// Reports
-async function getUserVisits(){
-  const user_id = document.getElementById('report_user_id').value;
-  const from = document.getElementById('report_from').value;
-  const to = document.getElementById('report_to').value;
-  const res = await fetch(`${API}/visits/${user_id}?from=${from}&to=${to}`);
-  const data = await res.json();
-  document.getElementById('userVisitsResult').innerText = JSON.stringify(data, null, 2);
-}
+    // Helper: Display table results
+    function displayTableResult(elementId, rows, columns) {
+      if (!rows || rows.length === 0) {
+        document.getElementById(elementId).innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>No data found</p>
+          </div>
+        `;
+        return;
+      }
 
-async function getSlotUsage(){
-  const slot_number = document.getElementById('report_slot_number').value;
-  const from = document.getElementById('slot_from').value;
-  const to = document.getElementById('slot_to').value;
-  const res = await fetch(`${API}/slot-usage/${slot_number}?from=${from}&to=${to}`);
-  const data = await res.json();
-  document.getElementById('slotUsageResult').innerText = JSON.stringify(data, null, 2);
-}
-</script>
+      let tableHTML = '<div class="table-responsive mt-3"><table class="table table-hover"><thead><tr>';
+      columns.forEach(col => tableHTML += `<th>${col}</th>`);
+      tableHTML += '</tr></thead><tbody>';
+
+      rows.forEach(row => {
+        tableHTML += '<tr>';
+        columns.forEach(col => {
+          const key = col.toLowerCase().replace(/\s+/g, '_');
+          tableHTML += `<td>${row[key] || '-'}</td>`;
+        });
+        tableHTML += '</tr>';
+      });
+
+      tableHTML += '</tbody></table></div>';
+      document.getElementById(elementId).innerHTML = tableHTML;
+    }
+
+    // 1. Create User
+    async function createUser() {
+      const full_name = document.getElementById('u_name').value;
+      const mobile = document.getElementById('u_mobile').value;
+      const email = document.getElementById('u_email').value;
+
+      if (!validateInput(full_name, 'Full Name') || !validateInput(mobile, 'Mobile') || !validateInput(email, 'Email')) return;
+
+      try {
+        const res = await fetch(API + '/users', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ full_name, mobile, email })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          showAlert('User created successfully!', 'success');
+          displayResult('userResult', data, true);
+          document.getElementById('u_name').value = '';
+          document.getElementById('u_mobile').value = '';
+          document.getElementById('u_email').value = '';
+        } else {
+          displayResult('userResult', data, false);
+        }
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'danger');
+      }
+    }
+
+    // 2. Create Vehicle
+    async function createVehicle() {
+      const user_id = document.getElementById('v_user_id').value;
+      const vehicle_number = document.getElementById('v_number').value;
+      const vehicle_type = document.getElementById('v_type').value;
+
+      if (!validateInput(user_id, 'User ID') || !validateInput(vehicle_number, 'Vehicle Number')) return;
+
+      try {
+        const res = await fetch(API + '/vehicles', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: parseInt(user_id), vehicle_number, vehicle_type })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          showAlert('Vehicle created successfully!', 'success');
+          displayResult('vehicleResult', data, true);
+          document.getElementById('v_user_id').value = '';
+          document.getElementById('v_number').value = '';
+        } else {
+          displayResult('vehicleResult', data, false);
+        }
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'danger');
+      }
+    }
+
+    // 3. Create Slot
+    async function createSlot() {
+      const slot_number = document.getElementById('s_number').value;
+      const slot_type = document.getElementById('s_type').value;
+
+      if (!validateInput(slot_number, 'Slot Number')) return;
+
+      try {
+        const res = await fetch(API + '/slots', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slot_number, slot_type })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          showAlert('Parking slot created successfully!', 'success');
+          displayResult('slotResult', data, true);
+          document.getElementById('s_number').value = '';
+        } else {
+          displayResult('slotResult', data, false);
+        }
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'danger');
+      }
+    }
+
+    // 4. Generate QR Code
+    async function getQRCode() {
+      const type = document.getElementById('qr_type').value;
+      const id = document.getElementById('qr_id').value;
+
+      if (!validateInput(id, 'ID')) return;
+
+      try {
+        const res = await fetch(API + '/qrcode/' + type + '/' + id);
+        const data = await res.json();
+        if (data.ok) {
+          document.getElementById('qrdemo').innerHTML = `
+            <div class="qr-container">
+              <div class="qr-payload">
+                <strong>Payload:</strong><br>${data.payload}
+              </div>
+              <img src="${data.dataUrl}" alt="QR Code" class="qr-image">
+            </div>
+          `;
+          showAlert('QR code generated successfully!', 'success');
+        } else {
+          document.getElementById('qrdemo').innerHTML = '';
+          showAlert(data.message || 'Failed to generate QR code', 'danger');
+        }
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'danger');
+      }
+    }
+
+    // 5. Scan Entry
+    async function scanEntry() {
+      const payload = document.getElementById('scan_payload_entry').value.trim();
+
+      if (!validateInput(payload, 'QR Payload')) return;
+
+      try {
+        const res = await fetch(API + '/scan/entry', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ payload })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          showAlert('Entry recorded successfully!', 'success');
+          displayResult('scanEntryResult', data, true);
+          document.getElementById('scan_payload_entry').value = '';
+        } else {
+          displayResult('scanEntryResult', data, false);
+          showAlert(data.message || 'Entry scan failed', 'warning');
+        }
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'danger');
+      }
+    }
+
+    // 6. Scan Exit
+    async function scanExit() {
+      const payload = document.getElementById('scan_payload_exit').value.trim();
+      const record_id = document.getElementById('exit_record_id').value.trim();
+
+      if (!validateInput(payload || record_id, 'QR Payload or Record ID')) return;
+
+      try {
+        const res = await fetch(API + '/scan/exit', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ payload: payload || null, record_id: record_id || null })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          showAlert('Exit recorded successfully!', 'success');
+          displayResult('scanExitResult', data, true);
+          document.getElementById('scan_payload_exit').value = '';
+          document.getElementById('exit_record_id').value = '';
+        } else {
+          displayResult('scanExitResult', data, false);
+          showAlert(data.message || 'Exit scan failed', 'warning');
+        }
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'danger');
+      }
+    }
+
+    // 7. List Current Parked Vehicles
+    async function listCurrent() {
+      try {
+        const res = await fetch(API + '/parking/current');
+        const data = await res.json();
+        if (data.ok && data.data.length > 0) {
+          displayTableResult('currentList', data.data, ['Record ID', 'Vehicle Number', 'Slot Number', 'Entry Time']);
+        } else if (data.ok) {
+          document.getElementById('currentList').innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-inbox"></i>
+              <p>No vehicles currently parked</p>
+            </div>
+          `;
+        } else {
+          showAlert('Failed to fetch current parked vehicles', 'danger');
+        }
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'danger');
+      }
+    }
+
+    // 8. Get User Visits Report
+    async function getUserVisits() {
+      const user_id = document.getElementById('report_user_id').value;
+      const from = document.getElementById('report_from').value;
+      const to = document.getElementById('report_to').value;
+
+      if (!validateInput(user_id, 'User ID')) return;
+
+      try {
+        const res = await fetch(`${API}/visits/${user_id}?from=${from}&to=${to}`);
+        const data = await res.json();
+        if (data.ok && data.data) {
+          displayTableResult('userVisitsResult', data.data, ['Record ID', 'Vehicle Number', 'Entry Time', 'Exit Time', 'Status', 'Amount']);
+          showAlert('Report generated successfully!', 'success');
+        } else {
+          showAlert(data.message || 'Failed to fetch visits report', 'warning');
+        }
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'danger');
+      }
+    }
+
+    // 9. Get Slot Usage Report
+    async function getSlotUsage() {
+      const slot_number = document.getElementById('report_slot_number').value;
+      const from = document.getElementById('slot_from').value;
+      const to = document.getElementById('slot_to').value;
+
+      if (!validateInput(slot_number, 'Slot Number')) return;
+
+      try {
+        const res = await fetch(`${API}/slot-usage/${slot_number}?from=${from}&to=${to}`);
+        const data = await res.json();
+        if (data.ok && data.data) {
+          displayTableResult('slotUsageResult', data.data, ['Record ID', 'Vehicle Number', 'Entry Time', 'Exit Time', 'Duration Hours']);
+          showAlert('Report generated successfully!', 'success');
+        } else {
+          showAlert(data.message || 'Failed to fetch slot usage report', 'warning');
+        }
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'danger');
+      }
+    }
+  </script>
 </body>
 </html>

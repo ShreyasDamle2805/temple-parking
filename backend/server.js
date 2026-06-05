@@ -194,6 +194,72 @@ app.get('/api/parking/current', async (req, res) => {
   }
 });
 
+// 8) User Visits Report
+app.get('/api/visits/:user_id', async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    const { from, to } = req.query;
+    let query = `
+      SELECT pr.record_id, v.vehicle_number, pr.entry_time, pr.exit_time, pr.status, pr.amount_paid
+      FROM parking_records pr
+      JOIN vehicles v ON pr.vehicle_id = v.vehicle_id
+      WHERE v.user_id = ?
+    `;
+    const params = [user_id];
+
+    if (from) {
+      query += ' AND pr.entry_time >= ?';
+      params.push(from);
+    }
+    if (to) {
+      query += ' AND pr.entry_time <= ?';
+      params.push(to);
+    }
+    query += ' ORDER BY pr.entry_time DESC';
+
+    const [rows] = await pool.query(query, params);
+    res.json({ ok:true, data: rows });
+  } catch(err) {
+    res.status(500).json({ ok:false, error: err.message });
+  }
+});
+
+// 9) Slot Usage Report
+app.get('/api/slot-usage/:slot_number', async (req, res) => {
+  try {
+    const { slot_number } = req.params;
+    const { from, to } = req.query;
+    let query = `
+      SELECT 
+        pr.record_id, 
+        v.vehicle_number, 
+        pr.entry_time, 
+        pr.exit_time,
+        ROUND(TIMESTAMPDIFF(HOUR, pr.entry_time, pr.exit_time), 2) as duration_hours
+      FROM parking_records pr
+      JOIN vehicles v ON pr.vehicle_id = v.vehicle_id
+      JOIN parking_slots ps ON pr.slot_id = ps.slot_id
+      WHERE ps.slot_number = ?
+    `;
+    const params = [slot_number];
+
+    if (from) {
+      query += ' AND pr.entry_time >= ?';
+      params.push(from);
+    }
+    if (to) {
+      query += ' AND pr.entry_time <= ?';
+      params.push(to);
+    }
+    query += ' ORDER BY pr.entry_time DESC';
+
+    const [rows] = await pool.query(query, params);
+    res.json({ ok:true, data: rows });
+  } catch(err) {
+    res.status(500).json({ ok:false, error: err.message });
+  }
+});
+
 // -------------------- START SERVER --------------------
 const PORT = 4000;
 
